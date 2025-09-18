@@ -1,67 +1,98 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { AddHabitDialog } from "@/components/ui/add-habit-dialog";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, CheckCircle, Circle, Flame, Target } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 const Habits = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showAddDialog, setShowAddDialog] = useState(false);
   
-  const [habits, setHabits] = useState([
-    {
-      id: 1,
-      title: "Morning Meditation",
-      description: "10 minutes of mindfulness",
-      completed: true,
-      streak: 7,
-      progress: 100,
-      icon: "🧘‍♀️",
-      color: "pulse-accent"
-    },
-    {
-      id: 2,
-      title: "Drink Water",
-      description: "8 glasses daily",
+  const [habits, setHabits] = useState(() => {
+    const saved = localStorage.getItem('pulsehabit-habits');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: 1,
+        title: "Morning Meditation",
+        description: "10 minutes of mindfulness",
+        completed: true,
+        streak: 7,
+        progress: 100,
+        icon: "🧘‍♀️",
+        color: "pulse-accent",
+        category: "Mindfulness"
+      },
+      {
+        id: 2,
+        title: "Drink Water",
+        description: "8 glasses daily",
+        completed: false,
+        streak: 5,
+        progress: 62,
+        icon: "💧",
+        color: "pulse-info",
+        category: "Health"
+      },
+      {
+        id: 3,
+        title: "Exercise",
+        description: "30 minutes activity",
+        completed: false,
+        streak: 3,
+        progress: 0,
+        icon: "💪",
+        color: "pulse-success",
+        category: "Fitness"
+      },
+      {
+        id: 4,
+        title: "Reading",
+        description: "20 pages daily",
+        completed: true,
+        streak: 12,
+        progress: 100,
+        icon: "📚",
+        color: "pulse-warning",
+        category: "Learning"
+      },
+      {
+        id: 5,
+        title: "Gratitude Journal",
+        description: "3 things daily",
+        completed: false,
+        streak: 2,
+        progress: 0,
+        icon: "✨",
+        color: "pulse-primary",
+        category: "Personal"
+      }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('pulsehabit-habits', JSON.stringify(habits));
+  }, [habits]);
+
+  const addNewHabit = (newHabit: any) => {
+    const habit = {
+      id: Date.now(),
+      ...newHabit,
       completed: false,
-      streak: 5,
-      progress: 62,
-      icon: "💧",
-      color: "pulse-info"
-    },
-    {
-      id: 3,
-      title: "Exercise",
-      description: "30 minutes activity",
-      completed: false,
-      streak: 3,
-      progress: 0,
-      icon: "💪",
-      color: "pulse-success"
-    },
-    {
-      id: 4,
-      title: "Reading",
-      description: "20 pages daily",
-      completed: true,
-      streak: 12,
-      progress: 100,
-      icon: "📚",
-      color: "pulse-warning"
-    },
-    {
-      id: 5,
-      title: "Gratitude Journal",
-      description: "3 things daily",
-      completed: false,
-      streak: 2,
-      progress: 0,
-      icon: "✨",
-      color: "pulse-primary"
-    }
-  ]);
+      streak: 0,
+      progress: 0
+    };
+    
+    setHabits(prev => [...prev, habit]);
+    
+    toast({
+      title: "New habit added! 🎉",
+      description: `${habit.title} has been added to your routine`,
+    });
+  };
 
   const toggleHabit = (habitId: number) => {
     setHabits(prev => prev.map(habit => {
@@ -128,12 +159,7 @@ const Habits = () => {
         {/* Add new habit button */}
         <Button 
           className="w-full h-14 mb-6 shadow-pulse"
-          onClick={() => {
-            toast({
-              title: "Coming Soon! 🚀",
-              description: "Habit creation feature is in development",
-            });
-          }}
+          onClick={() => setShowAddDialog(true)}
         >
           <Plus className="mr-2 w-5 h-5" />
           Add New Habit
@@ -221,6 +247,12 @@ const Habits = () => {
           </CardContent>
         </Card>
       </div>
+      
+      <AddHabitDialog
+        isOpen={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+        onAdd={addNewHabit}
+      />
     </div>
   );
 };

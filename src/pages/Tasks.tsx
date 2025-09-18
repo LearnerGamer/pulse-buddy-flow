@@ -4,75 +4,82 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, CheckCircle, Circle, Clock, AlertCircle, Calendar } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 const Tasks = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Review quarterly goals",
-      description: "Assess progress and adjust plans",
-      completed: false,
-      priority: "high",
-      dueDate: "Today",
-      category: "Work",
-      estimatedTime: "45 min"
-    },
-    {
-      id: 2,
-      title: "Call Mom",
-      description: "Weekly check-in call",
-      completed: false,
-      priority: "medium",
-      dueDate: "Today",
-      category: "Personal",
-      estimatedTime: "30 min"
-    },
-    {
-      id: 3,
-      title: "Grocery shopping",
-      description: "Weekly grocery run",
-      completed: true,
-      priority: "low",
-      dueDate: "Today",
-      category: "Personal",
-      estimatedTime: "60 min"
-    },
-    {
-      id: 4,
-      title: "Team standup meeting",
-      description: "Daily team sync",
-      completed: true,
-      priority: "medium",
-      dueDate: "Today",
-      category: "Work",
-      estimatedTime: "15 min"
-    },
-    {
-      id: 5,
-      title: "Plan weekend trip",
-      description: "Research destinations and book",
-      completed: false,
-      priority: "low",
-      dueDate: "Tomorrow",
-      category: "Personal",
-      estimatedTime: "90 min"
-    },
-    {
-      id: 6,
-      title: "Prepare presentation",
-      description: "Client presentation for Monday",
-      completed: false,
-      priority: "high",
-      dueDate: "Tomorrow",
-      category: "Work",
-      estimatedTime: "120 min"
-    }
-  ]);
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('pulsehabit-tasks');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: 1,
+        title: "Review quarterly goals",
+        description: "Assess progress and adjust plans",
+        completed: false,
+        priority: "high",
+        dueDate: "Today",
+        category: "Work",
+        estimatedTime: "45 min"
+      },
+      {
+        id: 2,
+        title: "Call Mom",
+        description: "Weekly check-in call",
+        completed: false,
+        priority: "medium",
+        dueDate: "Today",
+        category: "Personal",
+        estimatedTime: "30 min"
+      },
+      {
+        id: 3,
+        title: "Grocery shopping",
+        description: "Weekly grocery run",
+        completed: true,
+        priority: "low",
+        dueDate: "Today",
+        category: "Personal",
+        estimatedTime: "60 min"
+      },
+      {
+        id: 4,
+        title: "Team standup meeting",
+        description: "Daily team sync",
+        completed: true,
+        priority: "medium",
+        dueDate: "Today",
+        category: "Work",
+        estimatedTime: "15 min"
+      },
+      {
+        id: 5,
+        title: "Plan weekend trip",
+        description: "Research destinations and book",
+        completed: false,
+        priority: "low",
+        dueDate: "Tomorrow",
+        category: "Personal",
+        estimatedTime: "90 min"
+      },
+      {
+        id: 6,
+        title: "Prepare presentation",
+        description: "Client presentation for Monday",
+        completed: false,
+        priority: "high",
+        dueDate: "Tomorrow",
+        category: "Work",
+        estimatedTime: "120 min"
+      }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('pulsehabit-tasks', JSON.stringify(tasks));
+  }, [tasks]);
 
   const toggleTask = (taskId: number) => {
     setTasks(prev => prev.map(task => {

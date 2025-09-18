@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { StressPopup } from "@/components/ui/stress-popup";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, Mic, Zap, Brain, Heart, TrendingUp, Sparkles } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -22,6 +23,7 @@ const AIChat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [coachingMode, setCoachingMode] = useState<'friendly' | 'strict' | 'therapist'>('friendly');
+  const [showStressPopup, setShowStressPopup] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -55,8 +57,8 @@ const AIChat = () => {
         "Looking at your habit data, you're doing great with meditation and reading, but I notice exercise has been challenging. Your completion rate dropped to 57% this week. What obstacles are you facing with your workout routine?"
       ],
       stress: [
-        "I understand you're feeling stressed. Looking at your recent mood check-ins, I notice your stress levels have been higher on weekdays. Your mood data shows you're more relaxed after completing your evening routine. Have you considered adding a mid-day stress break?",
-        "Stress can really impact our habits and well-being. I see from your data that your mood tends to improve after mindfulness sessions. Your breathing exercises have a 90% correlation with better mood scores. Would you like to try a quick breathing session now?"
+        "I understand you're feeling stressed. Looking at your recent mood check-ins, I notice your stress levels have been higher on weekdays. Your mood data shows you're more relaxed after completing your evening routine. Would you like me to guide you through a quick breathing exercise?",
+        "Stress can really impact our habits and well-being. I see from your data that your mood tends to improve after mindfulness sessions. Your breathing exercises have a 90% correlation with better mood scores. Let me help you with a breathing exercise right now."
       ],
       motivation: [
         "You're doing better than you think! Your overall habit completion is 78% this week, and you've maintained an 18-day streak. That's incredible progress! Remember, consistency beats perfection. What's been your biggest win this week?",
@@ -65,6 +67,11 @@ const AIChat = () => {
       planning: [
         "Based on your patterns, I notice you're most productive on Wednesday and Thursday. Your energy levels are typically higher in the morning (4.2 avg) compared to evening (3.8 avg). Would you like me to suggest an optimal schedule for tomorrow?",
         "Looking at your task completion data, you handle 2-3 high-priority tasks best. Your mood data shows you feel more accomplished when you complete tasks early. Shall we plan your tomorrow with your energy patterns in mind?"
+      ],
+      offtopic: [
+        "I'm your PulseBuddy — I can help with habits, tasks, stress, or mood tracking. For food, I recommend grabbing a healthy snack 🍎.",
+        "I'm here to help with your wellness journey! I can assist with habits, mood, stress management, and task planning. What aspect of your well-being would you like to focus on?",
+        "That's outside my expertise, but I'm great at helping with habits, mood tracking, stress relief, and productivity. What wellness goal can I help you with today?"
       ]
     };
 
@@ -74,6 +81,8 @@ const AIChat = () => {
       return responses.habits[Math.floor(Math.random() * responses.habits.length)];
     }
     if (message.includes('stress') || message.includes('anxious') || message.includes('overwhelm')) {
+      // Trigger stress popup
+      setTimeout(() => setShowStressPopup(true), 1000);
       return responses.stress[Math.floor(Math.random() * responses.stress.length)];
     }
     if (message.includes('motivation') || message.includes('encourage') || message.includes('help')) {
@@ -81,6 +90,12 @@ const AIChat = () => {
     }
     if (message.includes('plan') || message.includes('tomorrow') || message.includes('schedule')) {
       return responses.planning[Math.floor(Math.random() * responses.planning.length)];
+    }
+    
+    // Check for off-topic queries
+    const offTopicKeywords = ['food', 'eat', 'restaurant', 'movie', 'music', 'weather', 'sports', 'politics', 'news'];
+    if (offTopicKeywords.some(keyword => message.includes(keyword))) {
+      return responses.offtopic[Math.floor(Math.random() * responses.offtopic.length)];
     }
     
     // Default personalized response
@@ -307,6 +322,17 @@ const AIChat = () => {
           </div>
         </div>
       </div>
+
+      <StressPopup 
+        isOpen={showStressPopup}
+        onClose={() => setShowStressPopup(false)}
+        onComplete={() => {
+          toast({
+            title: "Well done! 🌟",
+            description: "You earned +10 XP for completing a breathing exercise",
+          });
+        }}
+      />
     </div>
   );
 };
